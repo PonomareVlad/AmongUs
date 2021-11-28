@@ -24,10 +24,11 @@ among-us {
     --y: -1000px;
     position: absolute;
     display: block;
-    left: var(--x);
-    top: var(--y);
+    /*left: var(--x);*/
+    /*top: var(--y);*/
     width: var(--size);
     height: var(--size);
+    transform: translate(var(--x), var(--y));
 }
 
 among-us svg {

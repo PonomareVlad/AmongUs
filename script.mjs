@@ -5,22 +5,20 @@ const image = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 750" xml
               fill="#93cadf"/>
         <path d="M569.5 466.5c-2.2 30.5-6.7 60.7-10.9 91-3.9 28.2-8.5 56.3-13.3 84.4-1 5.6-3.4 8.8-8.7 10.6-13.2 4.5-26.7 4.4-40.3 2.8-7.4-.9-14.7-2.4-21.7-5-4.2-1.5-6.7-4-7.9-8.5-3.9-15.6-4-31.3-1.9-47 1-7.4 1.2-7.4 8.6-8.8 10.9-2.1 21.2-5.3 29.8-12.8 6.6-5.7 10.7-12.9 13.1-22.1-27.5 9.9-53.8 4.3-79.9-2.8-13.1-3.5-26-7.8-39-11.6-6.9-2-14-3.3-21.1-.7-9.9 3.5-14.2 11.5-16.5 21.1-3.4 14-4.4 28.3-5.2 42.6-1.1 18.7-1.7 37.4-1.8 56.1 0 1.9-.7 3.3-1.9 4.7-29.1 30.9-66.7 21.8-87.8-4-5.6-6.8-6.2-15.7-7.7-24-5.6-31.6-8-63.5-9.9-95.5-3.2-54.2-4.1-108.5-3.2-162.8.6-41 2.2-81.9 5.8-122.7 2.5-28.5 5.4-57 11.6-85.1 3.3-14.7 7.7-29 13.8-42.8C286.2 94.9 308.2 79 339 74.4c32-4.8 64.2-5.1 96.3-3.1 34 2.1 62.5 17.2 85 43 .9 1.1 2.2 1.9 2.4 3.9-6.5-.6-13-1.4-19.5-1.8-31.3-1.7-61.8 3-91.8 11.3-13.5 3.7-26.6 8.7-39.8 13.4-9.7 3.4-16.8 9.8-22.8 17.7-12.9 16.9-19.2 36.2-20.5 57.3-1.4 23 2.7 45.2 10.7 66.6 9.9 26.5 30.3 42.3 55.6 52.7 18.6 7.6 38.1 11.1 58 12.3 39 2.3 76.9-3.2 113.6-16.8 2.7-1 3.5-.6 3.6 2.4 1.4 44.2 2.9 88.7-.3 133.2zM206.4 247.6c-12.4-.8-24.9-1.6-36.9 2.5-7.7 2.6-12.8 7.7-14.9 15.8-5.5 21.4-8.3 43.3-10.5 65.2-2.9 29.1-4.7 58.3-4.6 87.6v11.9c.2 23.7 1.3 47.4 6.2 70.6 2 9.6 4.4 19 13.2 25.3 13.7 9.8 29.3 12.5 45.6 13.2 3.1.1 2.1-2 2.1-3.6-2.5-47.5-3.4-95-3.1-142.6.2-24.6.7-49.1 1.6-73.7.9-22.8 2.3-45.6 4-68.3.1-2.2-.1-3.7-2.7-3.9z"
               fill="#dc2227"/>
-</svg>`,
-    colors = ['#dc2227', '#132FD2', '#127F2D', '#ED54BA', '#f17d0e', '#f3f457', '#3F484E', '#D6E0F0', '#6A2FB9'],
-    soundURL = 'https://freesound.org/data/previews/577/577028_6512859-lq.mp3',
-    context = new AudioContext(),
+</svg>`, colors = ['#dc2227', '#132FD2', '#127F2D', '#ED54BA', '#f17d0e', '#f3f457', '#3F484E', '#D6E0F0', '#6A2FB9'],
+    soundURL = 'https://freesound.org/data/previews/577/577028_6512859-lq.mp3', context = new AudioContext(),
     play = () => {
         const source = context.createBufferSource();
         source.buffer = buffer;
         source.connect(context.destination);
         source.start();
-    },
-    createAmongUs = () => document.body.appendChild(document.createElement('among-us'))
+    }, createAmongUs = () => document.body.appendChild(document.createElement('among-us'))
 
 customElements.define('among-us', class AmongUs extends HTMLElement {
     constructor() {
         super()
-        this.maxAcceleration = 4;
+        this.killed = false
+        this.maxAcceleration = 4
         this.acceleration = {x: 0, y: 0}
         this.position = {x: 0, y: 0}
         this.frame = {x: 0, y: 0}
@@ -44,8 +42,7 @@ customElements.define('among-us', class AmongUs extends HTMLElement {
 
     setRandomPosition() {
         this.position = {
-            x: Math.floor(Math.random() * this.frame.x),
-            y: Math.floor(Math.random() * this.frame.y)
+            x: Math.floor(Math.random() * this.frame.x), y: Math.floor(Math.random() * this.frame.y)
         }
     }
 
@@ -73,6 +70,8 @@ customElements.define('among-us', class AmongUs extends HTMLElement {
     }
 
     kill() {
+        if (this.killed) return;
+        this.killed = true;
         this.style.pointerEvents = 'none';
         this.stop();
         play();
@@ -99,6 +98,9 @@ customElements.define('among-us', class AmongUs extends HTMLElement {
         this.style.setProperty('--y', this.position.y + "px");
     }
 })
+
+window.addEventListener('resize', () =>
+    document.querySelectorAll('among-us').forEach(amongUs => amongUs.updateFrame()))
 
 window.fetch(soundURL)
     .then(response => response.arrayBuffer())
